@@ -51,7 +51,6 @@ function planTrips(deliveries) {
     }
   }
 
-  // Sort by priority asc, area alphabetically, then weight desc (First-Fit Decreasing)
   valid.sort(
     (a, b) =>
       a.priority - b.priority ||
@@ -60,7 +59,7 @@ function planTrips(deliveries) {
   );
 
   const trips = [];
-  const areaTripsMap = new Map(); // area -> array of trips for this area
+  const areaTripsMap = new Map();
 
   for (const d of valid) {
     const areaTrips = areaTripsMap.get(d.area);
