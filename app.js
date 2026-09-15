@@ -51,16 +51,32 @@ function planTrips(deliveries) {
     }
   }
 
-  valid.sort((a, b) => a.priority - b.priority || a.area.localeCompare(b.area));
+  // Sort by priority asc, area alphabetically, then weight desc (First-Fit Decreasing)
+  valid.sort(
+    (a, b) =>
+      a.priority - b.priority ||
+      a.area.localeCompare(b.area) ||
+      b.weight - a.weight
+  );
 
   const trips = [];
+  const areaTripsMap = new Map(); // area -> array of trips for this area
+
   for (const d of valid) {
-    const trip = trips.find((t) => t.area === d.area && t.totalWeight + d.weight <= MAX_CAPACITY);
+    const areaTrips = areaTripsMap.get(d.area);
+    let trip = areaTrips?.find((t) => t.totalWeight + d.weight <= MAX_CAPACITY);
+
     if (trip) {
       trip.deliveries.push(d);
       trip.totalWeight += d.weight;
     } else {
-      trips.push({ area: d.area, deliveries: [d], totalWeight: d.weight });
+      trip = { area: d.area, deliveries: [d], totalWeight: d.weight };
+      trips.push(trip);
+      if (!areaTrips) {
+        areaTripsMap.set(d.area, [trip]);
+      } else {
+        areaTrips.push(trip);
+      }
     }
   }
 
