@@ -51,38 +51,25 @@ function planTrips(deliveries) {
     }
   }
 
-  valid.sort(
-    (a, b) =>
-      a.priority - b.priority ||
-      a.area.localeCompare(b.area) ||
-      b.weight - a.weight
-  );
+  valid.sort((a, b) => a.priority - b.priority || a.area.localeCompare(b.area));
 
   const trips = [];
-  const areaTripsMap = new Map();
-
   for (const d of valid) {
-    const areaTrips = areaTripsMap.get(d.area);
-    let trip = areaTrips?.find((t) => t.totalWeight + d.weight <= MAX_CAPACITY);
-
+    const trip = trips.find((t) => t.area === d.area && t.totalWeight + d.weight <= MAX_CAPACITY);
     if (trip) {
       trip.deliveries.push(d);
       trip.totalWeight += d.weight;
     } else {
-      trip = { area: d.area, deliveries: [d], totalWeight: d.weight };
-      trips.push(trip);
-      if (!areaTrips) {
-        areaTripsMap.set(d.area, [trip]);
-      } else {
-        areaTrips.push(trip);
-      }
+      trips.push({ area: d.area, deliveries: [d], totalWeight: d.weight });
     }
   }
 
   return { trips, warnings };
 }
 
-function renderResults(trips, warnings, parseErrors) {
+const PAGE_SIZE = 3;
+
+function renderResults(trips, warnings, parseErrors, page = 1) {
   const container = document.getElementById("results");
   let html = "";
 
@@ -95,13 +82,17 @@ function renderResults(trips, warnings, parseErrors) {
   if (!trips.length) {
     html += `<div class="info-msg">No deliveries to schedule.</div>`;
   } else {
+    const totalPages = Math.ceil(trips.length / PAGE_SIZE);
+    const start = (page - 1) * PAGE_SIZE;
+    const pageTrips = trips.slice(start, start + PAGE_SIZE);
+
     html += `<h2 style="margin-bottom: 0.75rem">Planned Trips (${trips.length})</h2><div class="trips-container">`;
-    trips.forEach((trip, idx) => {
+    pageTrips.forEach((trip, i) => {
       const minPriority = Math.min(...trip.deliveries.map((d) => d.priority));
       html += `
         <div class="trip-card">
           <div class="trip-header">
-            <h3>Trip ${idx + 1} — ${esc(trip.area)}</h3>
+            <h3>Trip ${start + i + 1} — ${esc(trip.area)}</h3>
             <span class="trip-meta">${trip.totalWeight.toFixed(1)} / ${MAX_CAPACITY} kg &nbsp;|&nbsp; Priority: ${minPriority}</span>
           </div>
           <table class="trip-table">
@@ -113,9 +104,21 @@ function renderResults(trips, warnings, parseErrors) {
         </div>`;
     });
     html += `</div>`;
+
+    if (totalPages > 1) {
+      html += `
+        <div class="pagination">
+          <button class="btn" id="prev-page" ${page === 1 ? "disabled" : ""}>◀ Prev</button>
+          <span>Page ${page} of ${totalPages}</span>
+          <button class="btn" id="next-page" ${page === totalPages ? "disabled" : ""}>Next ▶</button>
+        </div>`;
+    }
   }
 
   container.innerHTML = html;
+
+  document.getElementById("prev-page")?.addEventListener("click", () => renderResults(trips, warnings, parseErrors, page - 1));
+  document.getElementById("next-page")?.addEventListener("click", () => renderResults(trips, warnings, parseErrors, page + 1));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
