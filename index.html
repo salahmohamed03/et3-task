@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Upload a CSV of delivery requests and plan optimized trips with area grouping and priority ordering.">
+  <title>Delivery Trip Planner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Delivery Trip Planner</h1>
+
+  <div class="upload-section">
+    <label for="csv-file">Upload CSV File</label>
+    <input type="file" id="csv-file" accept=".csv">
+    <br>
+    <button class="btn" id="process-btn">Process Deliveries</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
