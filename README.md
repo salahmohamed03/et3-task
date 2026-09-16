@@ -57,7 +57,7 @@ Six packages with weights of [ 5, 4, 4, 3, 2, 2 ]
 
 ### 4. If the input contained 1,000,000 delivery requests, what part of your solution might become slow or memory-intensive?
 
-Processing 1,000,000 rows in the browser will encounter several severe bottlenecks:
+Processing 1,000,000 rows in the browser will encounter several bottlenecks:
 
 - Nested trips.find() loops scale to millions of checks and freeze execution
 - Running heavy parsing and sorting on the main thread locks up the UI; it could be fixed by using a Web Worker.

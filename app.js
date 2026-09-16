@@ -67,7 +67,7 @@ function planTrips(deliveries) {
   return { trips, warnings };
 }
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 4;
 
 function renderResults(trips, warnings, parseErrors, page = 1) {
   const container = document.getElementById("results");
